@@ -1,6 +1,8 @@
 'use client'
 import { useState } from 'react';
 import { Upload, Image, Zap, BarChart3, ExternalLink, ArrowRight, Sparkles, CheckCircle } from 'lucide-react';
+import Link from 'next/link';
+
 
 const TryOutSection = () => {
   const [isHovered, setIsHovered] = useState(false);
@@ -78,19 +80,20 @@ const TryOutSection = () => {
                 </div>
 
                 {/* CTA Button */}
-                <button
-                  className="group w-full bg-gradient-to-r from-teal-600 to-blue-600 text-white px-8 py-5 rounded-xl font-bold text-lg shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] relative overflow-hidden"
-                  onMouseEnter={() => setIsHovered(true)}
-                  onMouseLeave={() => setIsHovered(false)}
-                  onClick={() => window.open('/demo', '_blank')}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-teal-500 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="relative flex items-center justify-center gap-3">
-                    <Sparkles className={`w-6 h-6 transition-transform duration-300 ${isHovered ? 'rotate-12 scale-110' : ''}`} />
-                    <span>Launch Demo</span>
-                    <ExternalLink className={`w-5 h-5 transition-transform duration-300 ${isHovered ? 'translate-x-1 -translate-y-1' : ''}`} />
-                  </div>
-                </button>
+                <Link href='/model'>
+                  <button
+                    className="group w-full bg-gradient-to-r from-teal-600 to-blue-600 text-white px-8 py-5 rounded-xl font-bold text-lg shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] relative overflow-hidden"
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                    >
+                    <div className="absolute inset-0 bg-gradient-to-r from-teal-500 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="relative flex items-center justify-center gap-3">
+                      <Sparkles className={`w-6 h-6 transition-transform duration-300 ${isHovered ? 'rotate-12 scale-110' : ''}`} />
+                          <span>Launch Demo</span>
+                      <ExternalLink className={`w-5 h-5 transition-transform duration-300 ${isHovered ? 'translate-x-1 -translate-y-1' : ''}`} />
+                    </div>
+                  </button>
+                </Link>
 
                 <p className="text-xs text-gray-500 text-center mt-4">
                   Opens in a new window • No account required
