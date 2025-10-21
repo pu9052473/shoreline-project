@@ -1,5 +1,6 @@
 # Setting up flask backend.
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 import os
 import requests
 import time
@@ -7,14 +8,17 @@ from datetime import datetime, timedelta
 
 # app instance
 app = Flask(__name__)
+# Allow all origins, all methods, all headers
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Load environment variables
 SHORT_TERM_API_KEY = os.getenv('SHORT_TERM_API_KEY', 'your_short_term_api_key_here')
-SHORT_TERM_API_URL = os.getenv('SHORT_TERM_API_URL', 'https://your-short-term-api.com/predict')
+SHORT_TERM_API_URL = os.getenv('SHORT_TERM_API_URL', 'http://127.0.0.1:8000/forecast-7d/summary')
 LONG_TERM_API_KEY = os.getenv('LONG_TERM_API_KEY', 'your_long_term_api_key_here')
-LONG_TERM_API_URL = os.getenv('LONG_TERM_API_URL', 'https://your-long-term-api.com/predict')
+LONG_TERM_API_URL = os.getenv('LONG_TERM_API_URL', 'http://127.0.0.1:8080/shorelines/long-term')
 MODEL_TIMEOUT = int(os.getenv('MODEL_TIMEOUT', '30000'))
 MODEL_MAX_RETRIES = int(os.getenv('MODEL_MAX_RETRIES', '3'))
+MODEL_API_KEY = os.getenv('MODEL_API_KEY', 'your_model_api_key_here')
 
 # /api/home
 @app.route('/api/home', methods = ['GET'])
@@ -44,29 +48,31 @@ def predict_short_term():
         }
         
         # Make request to your short-term model API
-        response = requests.post(
+        response = requests.get(
             SHORT_TERM_API_URL,
             headers=headers,
-            json=payload,
+            params=payload,
             timeout=MODEL_TIMEOUT/1000
         )
-        
         if response.status_code == 200:
             model_result = response.json()
+            print("Short-term model response status:", model_result)
             
             # Process the model result and format for frontend
             predictions = []
-            for i in range(7):
+            daily_totals = model_result.get('daily_totals', [])
+            for i, day_data in enumerate(daily_totals):
                 day_num = i + 1
                 # Extract prediction data from your model's response
                 # Adjust these fields based on your actual model output
-                prediction = {
+                pred = {
                     'day': f'Day {day_num}',
-                    'erosion': model_result.get('predictions', [{}])[i].get('erosion_rate', 0.2 + (i * 0.05)),
-                    'confidence': model_result.get('predictions', [{}])[i].get('confidence', 95 + i),
-                    'image': model_result.get('predictions', [{}])[i].get('image_url', f'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=600&v={i}')
+                    'erosion':  day_data.get('total_m', 0.0),
+                    # 'confidence': model_result.get('predictions', [{}])[i].get('confidence', 95 + i),
+                    'confidence': 95,  # static placeholder,
+                    'image': f'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=600&v={i}'
                 }
-                predictions.append(prediction)
+                predictions.append(pred)
             
             return jsonify({
                 'success': True,
@@ -97,6 +103,7 @@ def predict_short_term():
             'message': str(e)
         }), 503
     except Exception as e:
+        print("error", e)
         return jsonify({
             'success': False,
             'error': 'Internal server error',
@@ -124,16 +131,14 @@ def predict_long_term():
         }
         
         # Make request to your long-term model API
-        response = requests.post(
+        response = requests.get(
             LONG_TERM_API_URL,
             headers=headers,
-            json=payload,
+            params=payload,
             timeout=MODEL_TIMEOUT/1000
         )
-        
         if response.status_code == 200:
             model_result = response.json()
-            
             # Process the model result and format for frontend
             predictions = []
             for i in range(4):
@@ -177,6 +182,7 @@ def predict_long_term():
             'message': str(e)
         }), 503
     except Exception as e:
+        print("error", e)
         return jsonify({
             'success': False,
             'error': 'Internal server error',

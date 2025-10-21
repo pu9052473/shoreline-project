@@ -1,0 +1,15 @@
+{
+  "holdout_years": [
+    2024,
+    2025
+  ],
+  "n_samples": 2,
+  "mae_overall_m": 15.57,
+  "mae_by_year_m": {
+    "2024": 5.57,
+    "2025": 25.57
+  },
+  "worst_10_transects_by_mae": [
+    10
+  ]
+}
