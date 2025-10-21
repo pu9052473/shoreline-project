@@ -1,0 +1,15 @@
+{
+  "features": [
+    "storm_days",
+    "wave_power",
+    "rain_3d_max",
+    "storm_index"
+  ],
+  "alpha": 30.0,
+  "train_years": [
+    2000,
+    2019
+  ],
+  "global_mean_delta": -1.6494062198860493,
+  "pathA": true
+}
