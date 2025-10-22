@@ -117,42 +117,46 @@ def predict_long_term():
         # Get request data
         data = request.get_json()
         timestamp = data.get('timestamp', datetime.now().isoformat())
-        
+        print("📩 Received request:", data)
+
         # Prepare request to your long-term model API
         headers = {
             'Authorization': f'Bearer {LONG_TERM_API_KEY}',
             'Content-Type': 'application/json'
         }
-        
+
         payload = {
             'model_type': 'long_term',
             'timestamp': timestamp,
             'duration': '1_month'
         }
-        
+
+        print("🚀 Sending to model:", LONG_TERM_API_URL, payload)
+
         # Make request to your long-term model API
         response = requests.get(
             LONG_TERM_API_URL,
             headers=headers,
             params=payload,
-            timeout=MODEL_TIMEOUT/1000
+            timeout=MODEL_TIMEOUT / 1000
         )
+
+        print("✅ Model response status:", response.status_code)
+        print("📦 Model response body:", response.text[:400])  # limit logs
+
         if response.status_code == 200:
             model_result = response.json()
-            # Process the model result and format for frontend
-            predictions = []
-            for i in range(4):
-                week_num = i + 1
-                # Extract prediction data from your model's response
-                # Adjust these fields based on your actual model output
-                prediction = {
-                    'week': f'Week {week_num}',
-                    'erosion': model_result.get('predictions', [{}])[i].get('erosion_rate', 0.8 + (i * 0.1)),
-                    'confidence': model_result.get('predictions', [{}])[i].get('confidence', 94 + i),
-                    'image': model_result.get('predictions', [{}])[i].get('image_url', f'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=600&v={i}')
-                }
-                predictions.append(prediction)
-            
+            print("Full model_result:", model_result)
+
+            # Check if 'features' key exists (GeoJSON FeatureCollection)
+            if "features" in model_result:
+                predictions = model_result["features"]
+            else:
+                # assume single feature
+                predictions = [model_result]
+
+            print("Extracted predictions:", predictions)
+
             return jsonify({
                 'success': True,
                 'predictions': predictions,
@@ -162,27 +166,32 @@ def predict_long_term():
                     'timestamp': timestamp
                 }
             })
+
         else:
+            # Model API returned non-200 response
+            print("⚠️ Model API error:", response.text)
             return jsonify({
                 'success': False,
                 'error': f'Model API returned status {response.status_code}',
-                'message': 'Failed to get prediction from model'
+                'message': response.text
             }), 500
-            
+
     except requests.exceptions.Timeout:
         return jsonify({
             'success': False,
             'error': 'Model API timeout',
             'message': 'The model took too long to respond'
         }), 504
+
     except requests.exceptions.RequestException as e:
         return jsonify({
             'success': False,
             'error': 'Model API connection failed',
             'message': str(e)
         }), 503
+
     except Exception as e:
-        print("error", e)
+        print("❌ Internal Error:", e)
         return jsonify({
             'success': False,
             'error': 'Internal server error',

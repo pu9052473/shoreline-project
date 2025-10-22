@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
+import PredictionMap from "../../components/PredictionMap";
 
 const ModelDemoPage = () => {
   const [shortTermLoading, setShortTermLoading] = useState(false);
@@ -152,7 +153,7 @@ const ModelDemoPage = () => {
     }
   };
 
-  const mockPredictionData = (modelId) => {
+  const mockPredictionData = (modelId: any) => {
     if (modelId === "short-term") {
       return {
         predictions: [
@@ -367,111 +368,7 @@ const ModelDemoPage = () => {
           {results && (
             <div className="mb-16 animate-fade-in">
               <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
-                {/* Results Header */}
-                <div className="bg-gradient-to-r from-slate-900 to-slate-800 p-8 text-white flex items-center justify-between">
-                  <div>
-                    <h3 className="text-2xl font-bold mb-2">
-                      {results.modelTitle} Results
-                    </h3>
-                    <p className="text-slate-300">
-                      Generated on {results.timestamp.toLocaleString()}
-                    </p>
-                    {results.error && (
-                      <div className="mt-2 flex items-center gap-2 text-amber-300">
-                        <AlertCircle className="w-4 h-4" />
-                        <span className="text-sm">{results.error}</span>
-                      </div>
-                    )}
-                    {results.modelInfo && (
-                      <div className="mt-2 text-sm text-slate-400">
-                        Model: {results.modelInfo.type} • Duration:{" "}
-                        {results.modelInfo.duration}
-                      </div>
-                    )}
-                  </div>
-                  {results.error ? (
-                    <AlertCircle className="w-12 h-12 text-amber-400" />
-                  ) : (
-                    <CheckCircle2 className="w-12 h-12 text-green-400" />
-                  )}
-                </div>
-
-                {/* Predictions Grid */}
-                <div className="p-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {results.data.predictions.map((pred, idx) => (
-                      <div
-                        key={idx}
-                        className="rounded-xl overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow duration-300"
-                      >
-                        {/* Image */}
-                        <div className="relative h-48 overflow-hidden bg-gray-100">
-                          <img
-                            src={pred.image}
-                            alt={pred.day || pred.week}
-                            className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-                        </div>
-
-                        {/* Prediction Info */}
-                        <div className="p-4 bg-white">
-                          <h4 className="font-bold text-gray-900 mb-3">
-                            {pred.day || pred.week}
-                          </h4>
-
-                          <div className="space-y-3">
-                            <div>
-                              <div className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">
-                                Erosion Rate
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <TrendingDown className="w-4 h-4 text-red-500" />
-                                <span className="text-lg font-bold text-red-600">
-                                  {pred.erosion}m
-                                </span>
-                              </div>
-                            </div>
-
-                            <div>
-                              <div className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">
-                                Confidence
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                  <div
-                                    className="h-full bg-gradient-to-r from-teal-500 to-blue-500 transition-all duration-500"
-                                    style={{ width: `${pred.confidence}%` }}
-                                  ></div>
-                                </div>
-                                <span className="text-sm font-bold text-gray-700">
-                                  {pred.confidence}%
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Download Section */}
-                <div className="bg-gray-50 p-8 border-t border-gray-200 flex items-center justify-between flex-wrap gap-4">
-                  <div>
-                    <h4 className="font-bold text-gray-900 mb-1">
-                      Export Results
-                    </h4>
-                    <p className="text-sm text-gray-600">
-                      Download the prediction data and imagery for further
-                      analysis
-                    </p>
-                  </div>
-                  <button className="flex items-center gap-2 px-6 py-3 bg-teal-600 text-white rounded-lg font-semibold hover:bg-teal-700 transition-colors">
-                    <Download className="w-5 h-5" />
-                    Download Report
-                  </button>
-                </div>
+                <PredictionMap predictions={results?.data?.predictions || []} />
               </div>
             </div>
           )}
