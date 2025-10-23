@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
+import PredictionMap from "../../components/PredictionMap";
+import ShortTermSummary from "@/components/SummaryReport";
 
 const ModelDemoPage = () => {
   const [shortTermLoading, setShortTermLoading] = useState(false);
@@ -97,12 +99,14 @@ const ModelDemoPage = () => {
         console.log("data:", data);
 
         // Handle API response format
-        if (data.success && data.predictions) {
+        if (data.success && data.model_result) {
           setResults({
             modelId,
             modelTitle: model.title,
             duration: model.duration,
-            data: { predictions: data.predictions },
+            data: {
+              model_result: data.model_result,
+            },
             timestamp: new Date(),
             modelInfo: data.model_info,
           });
@@ -152,7 +156,7 @@ const ModelDemoPage = () => {
     }
   };
 
-  const mockPredictionData = (modelId) => {
+  const mockPredictionData = (modelId: any) => {
     if (modelId === "short-term") {
       return {
         predictions: [
@@ -397,63 +401,21 @@ const ModelDemoPage = () => {
                 </div>
 
                 {/* Predictions Grid */}
+                {/* Results Display */}
                 <div className="p-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {results.data.predictions.map((pred, idx) => (
-                      <div
-                        key={idx}
-                        className="rounded-xl overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow duration-300"
-                      >
-                        {/* Image */}
-                        <div className="relative h-48 overflow-hidden bg-gray-100">
-                          <img
-                            src={pred.image}
-                            alt={pred.day || pred.week}
-                            className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-                        </div>
-
-                        {/* Prediction Info */}
-                        <div className="p-4 bg-white">
-                          <h4 className="font-bold text-gray-900 mb-3">
-                            {pred.day || pred.week}
-                          </h4>
-
-                          <div className="space-y-3">
-                            <div>
-                              <div className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">
-                                Erosion Rate
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <TrendingDown className="w-4 h-4 text-red-500" />
-                                <span className="text-lg font-bold text-red-600">
-                                  {pred.erosion}m
-                                </span>
-                              </div>
-                            </div>
-
-                            <div>
-                              <div className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">
-                                Confidence
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                  <div
-                                    className="h-full bg-gradient-to-r from-teal-500 to-blue-500 transition-all duration-500"
-                                    style={{ width: `${pred.confidence}%` }}
-                                  ></div>
-                                </div>
-                                <span className="text-sm font-bold text-gray-700">
-                                  {pred.confidence}%
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  {results.modelId === "short-term" ? (
+                    // ✅ Short-term summary view
+                    <div className="space-y-8">
+                      {results.data.model_result && (
+                        <ShortTermSummary
+                          modelResult={results.data.model_result}
+                        />
+                      )}
+                    </div>
+                  ) : (
+                   
+                    <PredictionMap predictions={results?.data?.predictions || []} />
+                  )}
                 </div>
 
                 {/* Download Section */}
