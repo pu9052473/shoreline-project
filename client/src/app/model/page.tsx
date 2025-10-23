@@ -14,6 +14,7 @@ import {
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import PredictionMap from "../../components/PredictionMap";
+import ShortTermSummary from "@/components/SummaryReport";
 
 const ModelDemoPage = () => {
   const [shortTermLoading, setShortTermLoading] = useState(false);
@@ -98,12 +99,14 @@ const ModelDemoPage = () => {
         console.log("data:", data);
 
         // Handle API response format
-        if (data.success && data.predictions) {
+        if (data.success && data.model_result) {
           setResults({
             modelId,
             modelTitle: model.title,
             duration: model.duration,
-            data: { predictions: data.predictions },
+            data: {
+              model_result: data.model_result,
+            },
             timestamp: new Date(),
             modelInfo: data.model_info,
           });
@@ -368,7 +371,69 @@ const ModelDemoPage = () => {
           {results && (
             <div className="mb-16 animate-fade-in">
               <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
-                <PredictionMap predictions={results?.data?.predictions || []} />
+                {/* Results Header */}
+                <div className="bg-gradient-to-r from-slate-900 to-slate-800 p-8 text-white flex items-center justify-between">
+                  <div>
+                    <h3 className="text-2xl font-bold mb-2">
+                      {results.modelTitle} Results
+                    </h3>
+                    <p className="text-slate-300">
+                      Generated on {results.timestamp.toLocaleString()}
+                    </p>
+                    {results.error && (
+                      <div className="mt-2 flex items-center gap-2 text-amber-300">
+                        <AlertCircle className="w-4 h-4" />
+                        <span className="text-sm">{results.error}</span>
+                      </div>
+                    )}
+                    {results.modelInfo && (
+                      <div className="mt-2 text-sm text-slate-400">
+                        Model: {results.modelInfo.type} • Duration:{" "}
+                        {results.modelInfo.duration}
+                      </div>
+                    )}
+                  </div>
+                  {results.error ? (
+                    <AlertCircle className="w-12 h-12 text-amber-400" />
+                  ) : (
+                    <CheckCircle2 className="w-12 h-12 text-green-400" />
+                  )}
+                </div>
+
+                {/* Predictions Grid */}
+                {/* Results Display */}
+                <div className="p-8">
+                  {results.modelId === "short-term" ? (
+                    // ✅ Short-term summary view
+                    <div className="space-y-8">
+                      {results.data.model_result && (
+                        <ShortTermSummary
+                          modelResult={results.data.model_result}
+                        />
+                      )}
+                    </div>
+                  ) : (
+                   
+                    <PredictionMap predictions={results?.data?.predictions || []} />
+                  )}
+                </div>
+
+                {/* Download Section */}
+                <div className="bg-gray-50 p-8 border-t border-gray-200 flex items-center justify-between flex-wrap gap-4">
+                  <div>
+                    <h4 className="font-bold text-gray-900 mb-1">
+                      Export Results
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      Download the prediction data and imagery for further
+                      analysis
+                    </p>
+                  </div>
+                  <button className="flex items-center gap-2 px-6 py-3 bg-teal-600 text-white rounded-lg font-semibold hover:bg-teal-700 transition-colors">
+                    <Download className="w-5 h-5" />
+                    Download Report
+                  </button>
+                </div>
               </div>
             </div>
           )}

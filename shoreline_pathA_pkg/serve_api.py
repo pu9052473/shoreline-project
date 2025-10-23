@@ -298,7 +298,6 @@ def forecast_summary(lat: float = -38.5, lon: float = 145.0, k: int = 10):
     df = pd.DataFrame(out["data"])
     if df.empty:
         return {"meta": out["meta"], "daily_totals": [], "top_transects": [], "bottom_transects": []}
-    print("out: ",len(out["data"]))
     daily = (df.groupby("date", as_index=False)["pred_daily_delta_m"]
                .sum().rename(columns={"pred_daily_delta_m": "total_m"}))
     weekly = (df.groupby("transect_id", as_index=False)["pred_daily_delta_m"]
@@ -319,6 +318,7 @@ def forecast_summary(lat: float = -38.5, lon: float = 145.0, k: int = 10):
     for c in ["mid_lat","mid_lon"]:
         if c in weekly.columns: weekly[c] = weekly[c].apply(jfloat)
 
+    print("out: ",weekly)
     return {
         "meta": out["meta"],
         "daily_totals": daily.to_dict(orient="records"),

@@ -59,30 +59,23 @@ def predict_short_term():
             print("Short-term model response status:", model_result)
             
             # Process the model result and format for frontend
-            predictions = []
             daily_totals = model_result.get('daily_totals', [])
-            for i, day_data in enumerate(daily_totals):
-                day_num = i + 1
-                # Extract prediction data from your model's response
-                # Adjust these fields based on your actual model output
-                pred = {
-                    'day': f'Day {day_num}',
-                    'erosion':  day_data.get('total_m', 0.0),
-                    # 'confidence': model_result.get('predictions', [{}])[i].get('confidence', 95 + i),
-                    'confidence': 95,  # static placeholder,
-                    'image': f'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=600&v={i}'
-                }
-                predictions.append(pred)
-            
+            if not daily_totals:
+                return jsonify({
+                    'success': False,
+                    'error': 'No daily totals returned from model'
+                }), 500
+
             return jsonify({
                 'success': True,
-                'predictions': predictions,
+                'model_result': model_result,
                 'model_info': {
                     'type': 'short_term',
                     'duration': '7_days',
                     'timestamp': timestamp
                 }
             })
+
         else:
             return jsonify({
                 'success': False,
