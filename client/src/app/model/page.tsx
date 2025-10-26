@@ -99,7 +99,7 @@ const ModelDemoPage = () => {
         console.log("data:", data);
 
         // Handle API response format
-        if (data.success && data.model_result) {
+        if (data.success && (data.model_result || data.predictions)) {
           setResults({
             modelId,
             modelTitle: model.title,
@@ -413,8 +413,9 @@ const ModelDemoPage = () => {
                       )}
                     </div>
                   ) : (
-                   
-                    <PredictionMap predictions={results?.data?.predictions || []} />
+                    <PredictionMap
+                      predictions={results?.data?.predictions || []}
+                    />
                   )}
                 </div>
 
