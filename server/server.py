@@ -138,27 +138,18 @@ def predict_long_term():
         print("📦 Model response body:", response.text[:400])  # limit logs
 
         if response.status_code == 200:
-            model_result = response.json()
-            print("Full model_result:", model_result)
+           model_result = response.json()
+           print("Long-term model result:", model_result)
 
-            # Check if 'features' key exists (GeoJSON FeatureCollection)
-            if "features" in model_result:
-                predictions = model_result["features"]
-            else:
-                # assume single feature
-                predictions = [model_result]
-
-            print("Extracted predictions:", predictions)
-
-            return jsonify({
-                'success': True,
-                'predictions': predictions,
-                'model_info': {
-                    'type': 'long_term',
-                    'duration': '1_month',
-                    'timestamp': timestamp
-                }
-            })
+           return jsonify({
+            'success': True,
+            'model_result': model_result, 
+            'model_info': {
+                'type': 'long_term',
+                'duration': '75_years',
+                'timestamp': timestamp
+            }
+           })
 
         else:
             # Model API returned non-200 response

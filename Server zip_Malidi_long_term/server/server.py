@@ -607,22 +607,15 @@ def _query_shorelines(features_list: List[Dict], years_index: Dict[int, List[int
 
         fc = _fc_from_indices(indices, features_list, round_coords=round_decimals is not None)
         # Fast serialization + correct media type for maps
+        print("fc; ",fc)
         if request.headers.get('Content-Type') == 'application/json':
-            predictions = []
-            for i, f in enumerate(fc["features"][:4]):  # take 4 weeks
-                props = f.get("properties", {})
-                prediction = {
-                    "erosion_rate": props.get("erosion_rate", 0.8 + (i * 0.1)),
-                    "confidence": props.get("confidence", 90 + i),
-                    "image_url": f"https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=600&v={i}"
-                }
-                predictions.append(prediction)
             return jsonify({
-                "predictions": predictions,
-                "source": "long_term_geojson",
-                "success": True
-            })
+            "success": True,
+            "source": "long_term_geojson",
+            "model_output": fc
+        })
         else:
+            print("orjson.dumps(fc): ",orjson.dumps(fc))
             return Response(orjson.dumps(fc), mimetype="application/geo+json")
 
     except ValueError as e:

@@ -414,7 +414,9 @@ const ModelDemoPage = () => {
                     </div>
                   ) : (
                     <PredictionMap
-                      predictions={results?.data?.predictions || []}
+                      predictions={
+                        results?.data?.model_result.model_output.features || []
+                      }
                     />
                   )}
                 </div>
