@@ -130,7 +130,7 @@ def predict_long_term():
         response = requests.get(
             LONG_TERM_API_URL,
             headers=headers,
-            params=payload,
+            json=payload,
             timeout=MODEL_TIMEOUT / 1000
         )
 
